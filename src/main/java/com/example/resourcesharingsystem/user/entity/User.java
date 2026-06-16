@@ -1,10 +1,13 @@
 package com.example.resourcesharingsystem.user.entity;
 
+import com.example.resourcesharingsystem.auth.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -18,9 +21,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String legalName;
     private String email;
     private String mobile;
-    private String address;
+    private int userState;
     @Column(name = "password_hash")
     private String passwordHash;
     @Column(name = "email_verified")
@@ -31,6 +35,7 @@ public class User {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
+    private boolean deleted;
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
@@ -50,5 +55,14 @@ public class User {
 
     @Column(name = "auth_provider")
     private String authProvider;
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet();
 
 }

@@ -2,6 +2,7 @@ package com.example.resourcesharingsystem.auth.service;
 
 import com.example.resourcesharingsystem.auth.entity.RefreshToken;
 import com.example.resourcesharingsystem.auth.repository.RefreshTokenRepository;
+import com.example.resourcesharingsystem.exception.InvalidRefreshTokenException;
 import com.example.resourcesharingsystem.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,5 +30,15 @@ public class RefreshTokensService {
                 .expiresAt(LocalDateTime.now().plusDays(refreshTokenExpirationDays))
                 .build();
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    public RefreshToken validateToken(String token){
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+
+        if(refreshToken.getExpiresAt().isBefore(LocalDateTime.now())){
+            throw new InvalidRefreshTokenException("Invalid refresh token");
+        }
+
+        return refreshToken;
     }
 }

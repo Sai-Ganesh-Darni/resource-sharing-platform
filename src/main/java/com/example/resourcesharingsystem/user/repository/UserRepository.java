@@ -1,4 +1,4 @@
-package com.example.resourcesharingsystem.user.repsitory;
+package com.example.resourcesharingsystem.user.repository;
 
 import com.example.resourcesharingsystem.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

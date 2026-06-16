@@ -6,6 +6,7 @@ import com.example.resourcesharingsystem.auth.dto.LoginResponse;
 import com.example.resourcesharingsystem.auth.dto.SignUpRequest;
 import com.example.resourcesharingsystem.auth.service.AuthService;
 import com.example.resourcesharingsystem.auth.util.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public AuthResponse signup(@Valid @RequestBody SignUpRequest signUpRequest) {
-        System.out.println("Hello World");
         authService.handleSignup(signUpRequest);
         return new AuthResponse("User signed up successfully");
     }
@@ -50,5 +50,35 @@ public class AuthController {
         return ResponseEntity.ok(
                 new AuthResponse("User logged in successfully")
         );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        String refreshToken =
+                cookieUtil.getCookieValue(
+                        httpServletRequest,
+                        "refresh_token"
+                );
+
+        String accessToken =
+                authService.refresh(
+                        refreshToken
+                );
+
+        httpServletResponse.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookieUtil
+                        .createAccessTokenCookie(
+                                accessToken
+                        )
+                        .toString()
+        );
+
+        return ResponseEntity.ok(
+                new AuthResponse(
+                        "Token refreshed"
+                )
+        );
+
     }
 }
