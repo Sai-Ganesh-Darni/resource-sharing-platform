@@ -1,0 +1,10 @@
+package com.example.resourcesharingsystem.repository;
+
+import com.example.resourcesharingsystem.entity.UserAddress;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface UserAddressRepository extends JpaRepository<UserAddress, Long> {
+    public List<UserAddress> findByUserId(Long userId);
+}

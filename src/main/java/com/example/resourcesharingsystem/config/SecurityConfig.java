@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import  com.example.resourcesharingsystem.auth.security.JwtAuthenticationFilter;
+import com.example.resourcesharingsystem.filter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,11 +27,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers(
-                                        "/api/admin/doc/**",
-                                        "/api/admin/openapi/**"
+                                        "/admin/doc/**",
+                                        "/admin/openapi/**"
                                 ).permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
 
                         )

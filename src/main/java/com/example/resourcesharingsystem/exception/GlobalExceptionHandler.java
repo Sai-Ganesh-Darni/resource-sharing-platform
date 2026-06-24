@@ -1,6 +1,6 @@
 package com.example.resourcesharingsystem.exception;
 
-import com.example.resourcesharingsystem.exception.dto.ValidationErrorResponse;
+import com.example.resourcesharingsystem.dto.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
