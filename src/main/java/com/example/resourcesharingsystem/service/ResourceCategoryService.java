@@ -1,7 +1,7 @@
 package com.example.resourcesharingsystem.service;
 
 import com.example.resourcesharingsystem.dto.ResourceCategoryResponse;
-import com.example.resourcesharingsystem.exception.ResourceCategoryAlreadyExists;
+import com.example.resourcesharingsystem.exception.AlreadyExistsException;
 import com.example.resourcesharingsystem.dto.AddResourceCategory;
 import com.example.resourcesharingsystem.entity.ResourceCategory;
 import com.example.resourcesharingsystem.mapper.ResourceCategoryMapper;
@@ -25,7 +25,7 @@ public class ResourceCategoryService {
     public void addResourceCategory(AddResourceCategory addResourceCategory) {
 
          if(resourceCategoryRepository.existsByName(addResourceCategory.getName()))
-             throw new ResourceCategoryAlreadyExists("Resource Category Already Exists");
+             throw new AlreadyExistsException("Resource Category Already Exists");
 
         ResourceCategory resourceCategory = ResourceCategory.builder()
                 .name(addResourceCategory.getName())

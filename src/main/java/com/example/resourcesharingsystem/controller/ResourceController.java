@@ -1,6 +1,10 @@
 package com.example.resourcesharingsystem.controller;
 
+import com.example.resourcesharingsystem.dto.BookingResponse;
+import com.example.resourcesharingsystem.dto.UpdateResource;
 import com.example.resourcesharingsystem.repository.RefreshTokenRepository;
+import com.example.resourcesharingsystem.service.AuthService;
+import com.example.resourcesharingsystem.service.BookingService;
 import com.example.resourcesharingsystem.utils.CookieUtil;
 import com.example.resourcesharingsystem.exception.InvalidRefreshTokenException;
 import com.example.resourcesharingsystem.dto.AddResourceRequest;
@@ -21,20 +25,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResourceController {
 
-    private final CookieUtil cookieUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResourceService resourceService;
+    private final AuthService authService;
+    private final BookingService bookingService;
 
     @PostMapping("/")
     @Valid
     public ResponseEntity<ResourceResponse>  createResource(@RequestBody AddResourceRequest addResourceRequest, HttpServletRequest request) {
-        String refreshToken =
-                cookieUtil.getCookieValue(
-                        request,
-                        "refresh_token"
-                );
-        User user = refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token")).getUser();
 
+        User user = authService.getLoginUser(request);
         addResourceRequest.setLoginUser(user);
 
         ResourceResponse resourceResponse = resourceService.addResource(addResourceRequest);
@@ -44,5 +44,21 @@ public class ResourceController {
     @GetMapping("/")
     public List<ResourceResponse> getAllResources(){
         return resourceService.getAllResources();
+    }
+
+
+    @GetMapping("/{id}")
+    public ResourceResponse getResourceById(@PathVariable Long id){
+        return resourceService.getResourceById(id);
+    }
+
+    @PatchMapping("/")
+    public UpdateResource updateResource(@RequestBody UpdateResource updateResource, HttpServletRequest request) {
+        return resourceService.updateResource(updateResource, request);
+    }
+
+    @GetMapping("/{resourceId}/bookings")
+    public List<BookingResponse> getBookings(@PathVariable Long resourceId){
+        return resourceService.getBookings(resourceId);
     }
 }

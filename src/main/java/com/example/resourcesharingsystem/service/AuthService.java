@@ -5,15 +5,18 @@ import com.example.resourcesharingsystem.dto.LoginRequest;
 import com.example.resourcesharingsystem.dto.LoginResponse;
 import com.example.resourcesharingsystem.dto.SignUpRequest;
 import com.example.resourcesharingsystem.entity.RefreshToken;
+import com.example.resourcesharingsystem.exception.AlreadyExistsException;
+import com.example.resourcesharingsystem.exception.InvalidRefreshTokenException;
+import com.example.resourcesharingsystem.exception.NotFoundException;
 import com.example.resourcesharingsystem.repository.RefreshTokenRepository;
 import com.example.resourcesharingsystem.repository.RoleRepository;
 import com.example.resourcesharingsystem.exception.InvalidCredentialsException;
-import com.example.resourcesharingsystem.exception.RoleNotFoundException;
-import com.example.resourcesharingsystem.exception.UserAlreadyExistsException;
 import com.example.resourcesharingsystem.entity.Role;
 import com.example.resourcesharingsystem.entity.User;
 import com.example.resourcesharingsystem.repository.UserRepository;
 
+import com.example.resourcesharingsystem.utils.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    private final CookieUtil cookieUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -34,7 +38,7 @@ public class AuthService {
     public void handleSignup(SignUpRequest signUpRequest) {
         // Check if the user exists with the same email or mobile
         if(userRepository.existsByEmail(signUpRequest.getEmail()) || userRepository.existsByMobile(signUpRequest.getMobile())){
-            throw new UserAlreadyExistsException("User already exists");
+            throw new AlreadyExistsException("User already exists");
         }
 
         User user = User.builder()
@@ -49,7 +53,7 @@ public class AuthService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        Role role = roleRepository.findByName("ROLE_CUSTOMER").orElseThrow(() -> new RoleNotFoundException("Role not found"));
+        Role role = roleRepository.findByName("ROLE_CUSTOMER").orElseThrow(() -> new NotFoundException("Role not found"));
         user.getRoles().add(role);
 
         userRepository.save(user);
@@ -89,5 +93,14 @@ public class AuthService {
         }
 
         return jwtService.generateToken(user.getEmail());
+    }
+
+    public User getLoginUser(HttpServletRequest request) {
+        String refreshToken =
+                cookieUtil.getCookieValue(
+                        request,
+                        "refresh_token"
+                );
+        return refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token")).getUser();
     }
 }

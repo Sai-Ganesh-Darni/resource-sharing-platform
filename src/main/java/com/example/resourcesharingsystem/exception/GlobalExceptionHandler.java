@@ -14,8 +14,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EmailAlreadyExistisException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistisException e){
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyExistsException(AlreadyExistsException e){
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
@@ -24,25 +24,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MobileAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleMobileAlreadyExistsException(MobileAlreadyExistsException e){
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException e){
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception exception) {
@@ -75,8 +56,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e){
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e){
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
@@ -115,26 +96,15 @@ public class GlobalExceptionHandler {
 
     }
 
-    @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException e){
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnAuthorizedException(UnAuthorizedException e){
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.UNAUTHORIZED.value())
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
-
-    @ExceptionHandler(ResourceCategoryAlreadyExists.class)
-    public ResponseEntity<ErrorResponse> handleResourceCategoryAlreadyExists(ResourceCategoryAlreadyExists e){
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
 
 
 }
