@@ -12,6 +12,9 @@ import com.example.resourcesharingsystem.repository.BookingRepository;
 import com.example.resourcesharingsystem.repository.ResourceRepository;
 import com.example.resourcesharingsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -42,11 +45,26 @@ public class BookingService {
     }
 
     public List<BookingResponse> getBookings(){
-        List<Booking> bookings = bookingRepository.findAll();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user;
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            String email;
+            if (principal instanceof UserDetails) {
+                email = ((UserDetails) principal).getUsername();
+            } else {
+                email = principal.toString();
+            }
+            user = userRepository.findByEmail(email);
+        }else {
+            throw new AuthenticationServiceException("Authentication required");
+        }
+        List<Booking> bookings = bookingRepository.findAllByRequestedBy(user);
         List<BookingResponse> bookingResponses = new ArrayList<>();
         for (Booking booking : bookings) {
             bookingResponses.add(BookingMapper.toResponse(booking));
         }
         return bookingResponses;
     }
+
 }

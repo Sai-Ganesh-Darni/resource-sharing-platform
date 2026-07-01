@@ -12,6 +12,7 @@ import com.example.resourcesharingsystem.mapper.ResourceMapper;
 import com.example.resourcesharingsystem.repository.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -68,8 +69,10 @@ public class ResourceService {
         return ResourceMapper.toResponse(createdResource);
     }
 
-    public List<ResourceResponse> getAllResources(){
-        List<Resource> resources = resourceRepository.findAll();
+    @Transactional
+    public List<ResourceResponse> getAllResources(int pageSize, int pageNumber) {
+        List<Resource> resources = resourceRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
+//        List<Resource> resources = resourceRepository.findAll();
         List<ResourceResponse> resourceResponseList = new ArrayList<>();
         for (Resource resource : resources) {
             ResourceResponse resourceResponse = ResourceMapper.toResponse(resource);
@@ -110,7 +113,7 @@ public class ResourceService {
         User user = authService.getLoginUser(request);
         Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseThrow(() -> new NotFoundException("Role not found"));
 
-        if(resource.getOwner().getId().equals(user.getId()) || !user.getRoles().contains(adminRole)) {
+        if(!resource.getOwner().getId().equals(user.getId()) || !user.getRoles().contains(adminRole)) {
             throw new UnAuthorizedException("You are not allowed to update this resource");
         }
 

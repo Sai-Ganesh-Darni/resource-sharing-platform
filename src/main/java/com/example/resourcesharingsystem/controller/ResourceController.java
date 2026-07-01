@@ -30,7 +30,7 @@ public class ResourceController {
     private final AuthService authService;
     private final BookingService bookingService;
 
-    @PostMapping("/")
+    @PostMapping
     @Valid
     public ResponseEntity<ResourceResponse>  createResource(@RequestBody AddResourceRequest addResourceRequest, HttpServletRequest request) {
 
@@ -41,9 +41,9 @@ public class ResourceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resourceResponse);
     }
 
-    @GetMapping("/")
-    public List<ResourceResponse> getAllResources(){
-        return resourceService.getAllResources();
+    @GetMapping
+    public List<ResourceResponse> getAllResources(@RequestParam(required = false, defaultValue = "5") int pageSize, @RequestParam(required = false, defaultValue = "1") int pageNumber) {
+        return resourceService.getAllResources(pageSize, pageNumber-1);
     }
 
 
@@ -52,7 +52,7 @@ public class ResourceController {
         return resourceService.getResourceById(id);
     }
 
-    @PatchMapping("/")
+    @PatchMapping
     public UpdateResource updateResource(@RequestBody UpdateResource updateResource, HttpServletRequest request) {
         return resourceService.updateResource(updateResource, request);
     }
